@@ -3,30 +3,36 @@ import axios from "axios";
 import { SERVER } from "../constants/server";
 import "../styles/Home.css";
 
+const fetchImages = async (setImages) => {
+  try {
+    const response = await axios.get(`${SERVER}/images`);
+    setImages(response.data);
+    console.log(response.data);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 const Home = () => {
   const [postImage, setPostImage] = useState(null);
   const [images, setImages] = useState([]);
 
   useEffect(() => {
-    const fetchImages = async () => {
-      try {
-        const response = await axios.get(`${SERVER}/images`);
-        setImages(response.data);
-        console.log(response.data);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    fetchImages();
+    fetchImages(setImages);
   }, []);
 
-  const handleSubmit = async (e) => {
+  const handleDragOver = (e) => {
     e.preventDefault();
-    if (!postImage) return;
+    e.target.classList.add("dragover");
+  };
+
+  const handleDrop = async (e) => {
+    e.preventDefault();
+    const pos = e.target.attributes[0].value;
+    const file = e.dataTransfer.files[0];
     const formData = new FormData();
-    formData.append("image", postImage[0]);
-    formData.append("pos", e.target.name);
-    console.log(formData);
+    formData.append("image", file);
+    formData.append("pos", pos);
     try {
       const response = await axios.post(`${SERVER}/images`, formData);
       setImages([...images, response.data]);
@@ -43,13 +49,13 @@ const Home = () => {
       tiles.push(
         <div key={i} className="card">
           {!image && (
-            <form onSubmit={handleSubmit} name={i}>
-              <input
-                onChange={(e) => setPostImage(e.target.files)}
-                type="file"
-              />
-              <button type="submit">Upload</button>
-            </form>
+            <div
+              name={i}
+              className="dropzone"
+              onDragOver={handleDragOver}
+              onDragLeave={(e) => e.target.classList.remove("dragover")}
+              onDrop={handleDrop}
+            >Drag and Drop and image</div>
           )}
           {image && <img src={`${SERVER}/uploads/${image.filename}`} />}
         </div>

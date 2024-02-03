@@ -10,10 +10,21 @@
   width: 100%;
   aspect-ratio: 1 / 1;
   background-color: rgb(121, 163, 163);
-  form {
-    input {
+  .dropzone {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    img {
       width: 100%;
+      aspect-ratio: 1 / 1;
+      object-fit: cover;
     }
+  }
+  .dragover {
+    background-color: rgba(0, 0, 0, 0.5);
   }
   img {
     display: block;

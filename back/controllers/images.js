@@ -13,13 +13,13 @@ export const getImages = async (req, res) => {
 export const postImage = async (req, res) => {
   const { filename } = req.file;
   const { pos } = req.body;
-  console.log(filename, Number(pos))
+  console.log(filename, Number(pos));
   try {
     const query = `INSERT INTO images (wall_id, pos, filename) VALUES ($1, $2, $3) RETURNING *`;
     const values = [1, Number(pos), filename];
     const { rows } = await pool.query(query, values);
     res.status(201).json(rows[0]);
-    console.log(rows[0])
+    console.log(rows[0]);
   } catch (error) {
     res.sendStatus(500);
   }
