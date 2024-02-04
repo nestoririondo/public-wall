@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { SERVER } from "../constants/server";
 import "../styles/Home.css";
@@ -8,7 +8,15 @@ const fetchImages = async (setImages) => {
   try {
     const response = await axios.get(`${SERVER}/images`);
     setImages(response.data);
-    console.log(response.data);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const checkNewImages = async (setImages, images) => {
+  try {
+    const response = await axios.get(`${SERVER}/images/count`);
+    response.data !== images.length ? fetchImages(setImages) : null;
   } catch (error) {
     console.log(error);
   }
@@ -16,10 +24,19 @@ const fetchImages = async (setImages) => {
 
 const Home = () => {
   const [images, setImages] = useState([]);
-  const [isZoomed, setIsZoomed] = useState(false);
+  const imagesRef = useRef(images);
+
+  useEffect(() => {
+    imagesRef.current = images;
+  }, [images]);
 
   useEffect(() => {
     fetchImages(setImages);
+    const intervalId = setInterval(
+      () => checkNewImages(setImages, imagesRef.current),
+      10000
+    );
+    return () => clearInterval(intervalId);
   }, []);
 
   const handleDragOver = (e) => {
@@ -36,8 +53,8 @@ const Home = () => {
     formData.append("pos", pos);
     try {
       const response = await axios.post(`${SERVER}/images`, formData);
+      console.log(response.status);
       setImages([...images, response.data]);
-      console.log(response.data);
     } catch (error) {
       console.log(error);
     }
