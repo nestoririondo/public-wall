@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { SERVER } from "../constants/server";
 import "../styles/Home.css";
-import uploadimage from "../assets/icons/uploadimage.png";
+import ModalImage from "react-modal-image";
 
 const fetchImages = async (setImages) => {
   try {
@@ -15,8 +15,8 @@ const fetchImages = async (setImages) => {
 };
 
 const Home = () => {
-  const [postImage, setPostImage] = useState(null);
   const [images, setImages] = useState([]);
+  const [isZoomed, setIsZoomed] = useState(false);
 
   useEffect(() => {
     fetchImages(setImages);
@@ -43,7 +43,7 @@ const Home = () => {
     }
   };
 
-  const handleClick = (e) => {
+  const handleUploadClick = (e) => {
     const input = document.createElement("input");
     input.type = "file";
     input.accept = "image/*";
@@ -73,13 +73,21 @@ const Home = () => {
             <div
               name={i}
               className="dropzone"
-              onClick={handleClick}
+              onClick={handleUploadClick}
               onDragOver={handleDragOver}
               onDragLeave={(e) => e.target.classList.remove("dragover")}
               onDrop={handleDrop}
             ></div>
           )}
-          {image && <img src={`${SERVER}/uploads/${image.filename}`} />}
+          {image && (
+            <div className="image">
+              <ModalImage
+                small={`${SERVER}/uploads/${image.filename}`}
+                large={`${SERVER}/uploads/${image.filename}`}
+                hideZoom={true}
+              />
+            </div>
+          )}
         </div>
       );
     }

@@ -5,6 +5,7 @@ export const getImages = async (req, res) => {
     const query = "SELECT * FROM images";
     const { rows } = await pool.query(query);
     res.status(200).json(rows);
+    console.log(`GET /images: ${rows.length}`);
   } catch (error) {
     res.status(404).json({ message: error.message });
   }

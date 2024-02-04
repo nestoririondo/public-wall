@@ -50,10 +50,15 @@
       opacity: 1;
     }
   }
-  img {
-    display: block;
-    aspect-ratio: 3 / 2;
-    width: 100%;
-    object-fit: cover;
+  .image {
+    img {
+      display: block;
+      aspect-ratio: 3 / 2;
+      width: 100%;
+      object-fit: cover;
+      &:hover {
+        opacity: 0.8;
+      }
+    }
   }
 }
