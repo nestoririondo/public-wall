@@ -16,23 +16,11 @@ export const postImage = async (req, res) => {
   const { pos, wall_id } = req.body;
   console.log(filename, Number(pos));
   try {
-    const query = `SELECT 1 FROM images WHERE pos = $1`;
-    const values = [pos];
+    const query = `INSERT INTO images (wall_id, pos, filename) VALUES ($1, $2, $3) RETURNING *`;
+    const values = [1, Number(pos), filename];
     const { rows } = await pool.query(query, values);
-    if (rows.length) {
-      res.status(409).json({ message: "Position already taken" });
-      return;
-    } else {
-      try {
-        const query = `INSERT INTO images (wall_id, pos, filename) VALUES ($1, $2, $3) RETURNING *`;
-        const values = [1, Number(pos), filename];
-        const { rows } = await pool.query(query, values);
-        res.status(201).json(rows[0]);
-        console.log(rows[0]);
-      } catch (error) {
-        res.sendStatus(500);
-      }
-    }
+    res.status(201).json(rows[0]);
+    console.log(rows[0]);
   } catch (error) {
     res.sendStatus(500);
   }

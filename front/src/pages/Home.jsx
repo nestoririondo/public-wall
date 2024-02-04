@@ -70,6 +70,7 @@ const Home = () => {
       const formData = new FormData();
       formData.append("image", file);
       formData.append("pos", pos);
+      console.log("Formdata", formData);
       try {
         const response = await axios.post(`${SERVER}/images`, formData);
         setImages([...images, response.data]);
