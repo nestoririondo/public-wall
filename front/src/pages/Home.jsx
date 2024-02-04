@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { SERVER } from "../constants/server";
 import "../styles/Home.css";
+import uploadimage from "../assets/icons/uploadimage.png";
 
 const fetchImages = async (setImages) => {
   try {
@@ -42,6 +43,26 @@ const Home = () => {
     }
   };
 
+  const handleClick = (e) => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.onchange = async (event) => {
+      const file = event.target.files[0];
+      const pos = e.target.attributes.name.value;
+      const formData = new FormData();
+      formData.append("image", file);
+      formData.append("pos", pos);
+      try {
+        const response = await axios.post(`${SERVER}/images`, formData);
+        setImages([...images, response.data]);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    input.click();
+  };
+
   const createCards = (amount) => {
     let tiles = [];
     for (let i = 0; i < amount; i++) {
@@ -52,10 +73,11 @@ const Home = () => {
             <div
               name={i}
               className="dropzone"
+              onClick={handleClick}
               onDragOver={handleDragOver}
               onDragLeave={(e) => e.target.classList.remove("dragover")}
               onDrop={handleDrop}
-            >Drag and Drop and image</div>
+            ></div>
           )}
           {image && <img src={`${SERVER}/uploads/${image.filename}`} />}
         </div>
@@ -65,7 +87,7 @@ const Home = () => {
   };
 
   return (
-    <div className="Home">
+    <div className="home">
       <div className="grid">{createCards(25)}</div>
     </div>
   );
