@@ -4,10 +4,11 @@ import { SERVER } from "../constants/server";
 import "../styles/Home.css";
 import ModalImage from "react-modal-image";
 
-const fetchImages = async (setImages) => {
+const fetchImages = async (setImages, setCurrentWall) => {
   try {
     const response = await axios.get(`${SERVER}/images`);
     setImages(response.data);
+    setCurrentWall(response.data[0].wall_id);
   } catch (error) {
     console.log(error);
   }
@@ -16,7 +17,8 @@ const fetchImages = async (setImages) => {
 const checkNewImages = async (setImages, images) => {
   try {
     const response = await axios.get(`${SERVER}/images/count`);
-    response.data !== images.length ? fetchImages(setImages) : null;
+    response.data > images.length ? fetchImages(setImages, setCurrentWall) : null;
+    console.log(response.data, images.length);
   } catch (error) {
     console.log(error);
   }
@@ -32,7 +34,7 @@ const Home = () => {
   }, [images]);
 
   useEffect(() => {
-    fetchImages(setImages);
+    fetchImages(setImages, setCurrentWall);
     const intervalId = setInterval(
       () => checkNewImages(setImages, imagesRef.current),
       10000
@@ -53,7 +55,9 @@ const Home = () => {
     console.log("Formdata", formData);
     try {
       const response = await axios.post(`${SERVER}/images`, formData);
-      setImages([...images, response.data]);
+      setImages((prevImages) => [...prevImages, response.data.image]);
+      setCurrentWall(response.data.wall_id);
+      console.log(response.data);
     } catch (error) {
       console.log(error);
     }
@@ -81,7 +85,9 @@ const Home = () => {
   const createCards = (amount) => {
     let tiles = [];
     for (let i = 0; i < amount; i++) {
-      const image = images.find((img) => img.pos === i);
+      const image = images.find(
+        (img) => img.pos === i && img.wall_id === currentWall
+      );
       tiles.push(
         <div key={i} className="card">
           {!image && (
