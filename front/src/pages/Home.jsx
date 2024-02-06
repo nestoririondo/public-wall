@@ -24,6 +24,7 @@ const checkNewImages = async (setImages, images) => {
 
 const Home = () => {
   const [images, setImages] = useState([]);
+  const [currentWall, setCurrentWall] = useState(1);
   const imagesRef = useRef(images);
 
   useEffect(() => {
@@ -44,20 +45,25 @@ const Home = () => {
     e.target.classList.add("dragover");
   };
 
-  const handleDrop = async (e) => {
-    e.preventDefault();
-    const pos = e.target.attributes[0].value;
-    const file = e.dataTransfer.files[0];
+  const handleUpload = async (file, pos) => {
     const formData = new FormData();
     formData.append("image", file);
     formData.append("pos", pos);
+    formData.append("wall_id", currentWall);
+    console.log("Formdata", formData);
     try {
       const response = await axios.post(`${SERVER}/images`, formData);
-      console.log(response.status);
       setImages([...images, response.data]);
     } catch (error) {
       console.log(error);
     }
+  };
+
+  const handleDrop = async (e) => {
+    e.preventDefault();
+    const pos = e.target.attributes[0].value;
+    const file = e.dataTransfer.files[0];
+    handleUpload(file, pos);
   };
 
   const handleUploadClick = (e) => {
@@ -67,16 +73,7 @@ const Home = () => {
     input.onchange = async (event) => {
       const file = event.target.files[0];
       const pos = e.target.attributes.name.value;
-      const formData = new FormData();
-      formData.append("image", file);
-      formData.append("pos", pos);
-      console.log("Formdata", formData);
-      try {
-        const response = await axios.post(`${SERVER}/images`, formData);
-        setImages([...images, response.data]);
-      } catch (error) {
-        console.log(error);
-      }
+      handleUpload(file, pos);
     };
     input.click();
   };
